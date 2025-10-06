@@ -1,59 +1,45 @@
-import unittest
-from probapp import convert_currency, EXCHANGE_RATES
+import pytest
+from probapp import convert_currency, EXCHANGE_RATES, main
 
-class TestCurrencyConverter(unittest.TestCase):
+# ------------------- Простые тесты convert_currency -------------------
 
-    def test_usd_to_eur(self):
-        amount = 100
-        from_currency = "USD"
-        to_currency = "EUR"
-    
-        result = convert_currency(amount, from_currency, to_currency)
-        
-        expected = round(amount * EXCHANGE_RATES[to_currency] / EXCHANGE_RATES[from_currency], 2)
-        self.assertEqual(result, expected)
+def test_usd_to_eur():
+    assert convert_currency(100, "USD", "EUR") == 85.0
 
-    def test_rub_to_usd(self):
-       
-        amount = 8300
-        from_currency = "RUB"
-        to_currency = "USD"
-        
-        result = convert_currency(amount, from_currency, to_currency)
-        
-        expected = round(amount * EXCHANGE_RATES[to_currency] / EXCHANGE_RATES[from_currency], 2)
-        self.assertEqual(result, expected)
+def test_rub_to_usd():
+    assert convert_currency(8300, "RUB", "USD") == 100.0
 
-    def test_same_currency(self):
-        
-        amount = 500
-        from_currency = "CNY"
-        to_currency = "CNY"
-        
-        result = convert_currency(amount, from_currency, to_currency)
-        
-        self.assertEqual(result, amount)
+def test_same_currency():
+    assert convert_currency(500, "CNY", "CNY") == 500
 
-    def test_invalid_from_currency(self):
+def test_invalid_from_currency():
+    with pytest.raises(ValueError):
+        convert_currency(100, "ABC", "USD")
 
-        amount = 100
-        from_currency = "ABC"
-        to_currency = "USD"
-        
+def test_invalid_to_currency():
+    with pytest.raises(ValueError):
+        convert_currency(100, "USD", "XYZ")
 
-        with self.assertRaises(ValueError) as context:
-            convert_currency(amount, from_currency, to_currency)
-        self.assertIn("Неизвестная валюта", str(context.exception))
 
-    def test_invalid_to_currency(self):
+# ------------------- Простые тесты main() с monkeypatch -------------------
 
-        amount = 100
-        from_currency = "USD"
-        to_currency = "XYZ"
-        
-        with self.assertRaises(ValueError) as context:
-            convert_currency(amount, from_currency, to_currency)
-        self.assertIn("Неизвестная валюта", str(context.exception))
+def test_main_valid(monkeypatch, capsys):
+    inputs = iter(['100', 'USD', 'EUR'])
+    monkeypatch.setattr('builtins.input', lambda _: next(inputs))
+    main()
+    captured = capsys.readouterr()
+    assert '100.0 USD = 85.0 EUR' in captured.out
 
-if __name__ == "__main__":
-    unittest.main()
+def test_main_invalid_from(monkeypatch, capsys):
+    inputs = iter(['100', 'ABC', 'EUR'])
+    monkeypatch.setattr('builtins.input', lambda _: next(inputs))
+    main()
+    captured = capsys.readouterr()
+    assert 'Неизвестная валюта' in captured.out
+
+def test_main_invalid_to(monkeypatch, capsys):
+    inputs = iter(['100', 'USD', 'XYZ'])
+    monkeypatch.setattr('builtins.input', lambda _: next(inputs))
+    main()
+    captured = capsys.readouterr()
+    assert 'Неизвестная валюта' in captured.out

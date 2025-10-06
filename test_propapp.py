@@ -1,7 +1,7 @@
 import pytest
 from probapp import convert_currency, EXCHANGE_RATES, main
 
-# ------------------- Простые тесты convert_currency -------------------
+
 
 def test_usd_to_eur():
     assert convert_currency(100, "USD", "EUR") == 85.0
@@ -21,7 +21,7 @@ def test_invalid_to_currency():
         convert_currency(100, "USD", "XYZ")
 
 
-# ------------------- Простые тесты main() с monkeypatch -------------------
+
 
 def test_main_valid(monkeypatch, capsys):
     inputs = iter(['100', 'USD', 'EUR'])

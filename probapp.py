@@ -1,9 +1,10 @@
+#Курс актуален на 06.10.2025 21:40
 
 EXCHANGE_RATES = {
     "USD": 1.0,        
-    "EUR": 0.92,
-    "RUB": 96.5,
-    "GBP": 0.82
+    "EUR": 0.85,
+    "RUB": 83.0,
+    "CNY": 7.12
 }
 
 def convert_currency(amount: float, from_currency: str, to_currency: str) -> float:

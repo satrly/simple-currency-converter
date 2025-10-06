@@ -1,6 +1,5 @@
-
 import unittest
-from .probapp import convert_currency, EXCHANGE_RATES
+from probapp import convert_currency, EXCHANGE_RATES
 
 class TestCurrencyConverter(unittest.TestCase):
 
